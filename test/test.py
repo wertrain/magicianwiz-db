@@ -11,6 +11,18 @@ def read_html(filepath):
 
 html = read_html('data/29849.html')
 soup = BeautifulSoup(html, 'html.parser')
-print(soup.prettify())
+#print(soup.prettify())
 
+spirit_name = ''
+spirit_src_url = ''
 
+wiz_value = soup.find('h2', id='wiz_value')
+spirit_image_url = wiz_value.find_next_siblings('img')[0]['src']
+wiz_value_table = wiz_value.find_next_siblings('table')[0]
+for row in wiz_value_table.find_all('tr'):
+    for col in row.find_all('td'):
+        spirit_name = col.string
+        break
+
+print (spirit_name)
+print (spirit_image_url)
