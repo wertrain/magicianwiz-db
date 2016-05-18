@@ -20,16 +20,18 @@ spirit_image_url = ''
 spirit_score = ''
 spirit_type = ''
 spirit_cost = ''
-sprite_hp_base = ''
-sprite_hp = ''
-sprite_attack_base = ''
-sprite_attack =  ''
-sprite_as2 =  ''
-sprite_as1 =  ''
-
+spirit_hp_base = ''
+spirit_hp = ''
+spirit_attack_base = ''
+spirit_attack =  ''
+spirit_as2 =  ''
+spirit_as1 =  ''
+spirit_ss2_type = ''
+spirit_ss1_type = ''
 
 number_re = re.compile('\d.\d')
 status_re = re.compile('\d+')
+ss_re = re.compile('">\S+</a>')
 
 wiz_value = soup.find('h2', id='wiz_value')
 spirit_image_url = wiz_value.find_next_siblings('img')[0]['src']
@@ -60,13 +62,13 @@ for row in wiz_status_table.find_all('tr'):
         elif row_count == 2:
             m = status_re.findall(str(col))
             if m is not None:
-                sprite_hp_base = m[0]
-                sprite_hp = m[1]
+                spirit_hp_base = m[0]
+                spirit_hp = m[1]
         elif row_count == 3:
             m = status_re.findall(str(col))
             if m is not None:
-                sprite_attack_base = m[0]
-                sprite_attack = m[1]
+                spirit_attack_base = m[0]
+                spirit_attack = m[1]
         row_count = row_count + 1
 
 # AS/SSの展開
@@ -75,17 +77,24 @@ wiz_as_table = wiz_status_table.find_next_siblings('h3')[0].find_next_siblings('
 for row in wiz_as_table.find_all('tr'):
     for col in row.find_all('td'):
         if row_count == 0:
-            sprite_as2 = col.string
+            spirit_as2 = col.string
         elif row_count == 1:
-            sprite_as1 = col.string
+            spirit_as1 = col.string
         row_count = row_count + 1
 
-#row_count = 0
-#wiz_ss_table = wiz_as_table.find_next_siblings('table')[0]
-#for row in wiz_ss_table.find_all('tr'):
-#    for col in row.find_all('td'):
-#        print col.string
-#        row_count = row_count + 1
+row_count = 0
+wiz_ss_table = wiz_as_table.find_next_siblings('table')[0]
+for row in wiz_ss_table.find_all('tr'):
+    for col in row.find_all('td'):
+        if row_count == 0:
+            m = ss_re.findall(str(col))
+            if m is not None:
+                spirit_ss2_type = unicode(m[0][2:-4],'utf-8')
+        elif row_count == 1:
+            m = ss_re.findall(str(col))
+            if m is not None:
+                spirit_ss1_type = unicode(m[0][2:-4],'utf-8')
+        row_count = row_count + 1
 
 #urllib.urlretrieve(spirit_image_url, 'data/29849.jpg')
 #print (spirit_name)
@@ -95,3 +104,4 @@ for row in wiz_as_table.find_all('tr'):
 #print (sprite_attack_base)
 #print (sprite_attack)
 #print (sprite_as2)
+print (spirit_ss1_type)
