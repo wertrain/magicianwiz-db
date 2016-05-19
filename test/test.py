@@ -28,10 +28,16 @@ spirit_as2 =  ''
 spirit_as1 =  ''
 spirit_ss2_type = ''
 spirit_ss1_type = ''
+spirit_ss2_turn = ''
+spirit_ss1_turn = ''
+spirit_ss2 = ''
+spirit_ss1 = ''
+spirit_legend_mode = []
+spirit_potential = []
 
 number_re = re.compile('\d.\d')
 status_re = re.compile('\d+')
-ss_re = re.compile('">\S+</a>')
+ss_type_re = re.compile('<\S+>')
 
 wiz_value = soup.find('h2', id='wiz_value')
 spirit_image_url = wiz_value.find_next_siblings('img')[0]['src']
@@ -71,7 +77,7 @@ for row in wiz_status_table.find_all('tr'):
                 spirit_attack = m[1]
         row_count = row_count + 1
 
-# AS/SSの展開
+# ASの展開
 row_count = 0
 wiz_as_table = wiz_status_table.find_next_siblings('h3')[0].find_next_siblings('table')[0]
 for row in wiz_as_table.find_all('tr'):
@@ -82,19 +88,60 @@ for row in wiz_as_table.find_all('tr'):
             spirit_as1 = col.string
         row_count = row_count + 1
 
+# SSの展開
 row_count = 0
 wiz_ss_table = wiz_as_table.find_next_siblings('table')[0]
 for row in wiz_ss_table.find_all('tr'):
     for col in row.find_all('td'):
         if row_count == 0:
-            m = ss_re.findall(str(col))
+            m = ss_type_re.findall(col.get_text())
             if m is not None:
-                spirit_ss2_type = unicode(m[0][2:-4],'utf-8')
+                spirit_ss2_type = m[0][1:-1]
+            tmp = col.get_text()
+            spirit_ss2 = tmp[tmp.find(u'>')+1:tmp.find(u'【')]
+            spirit_ss2_turn = tmp[tmp.find(u'【')+1:tmp.find(u'】')]
         elif row_count == 1:
-            m = ss_re.findall(str(col))
+            m = ss_type_re.findall(col.get_text())
             if m is not None:
-                spirit_ss1_type = unicode(m[0][2:-4],'utf-8')
+                spirit_ss1_type = m[0][1:-1]
+            tmp = col.get_text()
+            spirit_ss1 = tmp[tmp.find(u'>')+1:tmp.find(u'【')]
+            spirit_ss1_turn = tmp[tmp.find(u'【')+1:tmp.find(u'】')]
         row_count = row_count + 1
+
+row_count = 0
+wiz_awaken_table = wiz_ss_table.find_next_siblings('table')[0]
+wiz_legend_table = wiz_awaken_table.find_next_siblings('table')[0]
+name = ''
+explanation = ''
+for row in wiz_legend_table.find_all('tr'):
+    for col in row.find_all('td'):
+        if len(name) == 0:
+            name = col.get_text();
+        else:
+            explanation = col.get_text();
+            spirit_legend_mode.append({
+              'name': name,
+              'explanation': explanation
+            })
+            name = ''
+
+# 潜在能力の展開
+wiz_potential = soup.find('h2', id='wiz_potential')
+wiz_potential_table = wiz_potential.find_next_siblings('table')[0]
+name = ''
+explanation = ''
+for row in wiz_potential_table.find_all('tr'):
+    for col in row.find_all('td'):
+        if len(name) == 0:
+            name = col.get_text();
+        else:
+            explanation = col.get_text();
+            spirit_potential.append({
+              'name': name,
+              'explanation': explanation
+            })
+            name = ''
 
 #urllib.urlretrieve(spirit_image_url, 'data/29849.jpg')
 #print (spirit_name)
@@ -104,4 +151,6 @@ for row in wiz_ss_table.find_all('tr'):
 #print (sprite_attack_base)
 #print (sprite_attack)
 #print (sprite_as2)
-print (spirit_ss1_type)
+#print (spirit_ss1_type)
+#print (spirit_as2)
+
