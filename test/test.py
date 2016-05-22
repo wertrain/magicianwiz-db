@@ -14,4 +14,8 @@ def read_html(filepath):
 
 html = read_html('data/29878.html')
 spirit = gamewith.perse_spirit_state(html)
-print spirit['id']
+print spirit
+
+#html = read_html('data/11554.html')
+#spirit = gamewith.perse_spirit_state(html)
+#print spirit['id']
