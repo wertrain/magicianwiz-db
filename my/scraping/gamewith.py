@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 import re
+from gae import log
 
 def perse_spirit_state(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -38,11 +39,10 @@ def perse_spirit_state(html):
     # ID の取得
     canonical_url = soup.find('link', rel='canonical')['href']
     spirit_id = canonical_url[canonical_url.rfind('/')+1:len(canonical_url)]
+    # 画像 URL 
+    spirit_image_url = soup.find('img', width='200')['src']
+    wiz_value = soup.find('img', width='200')
     
-    # URL の取得
-    wiz_value = soup.find('h2', id='wiz_value')
-    spirit_image_url = wiz_value.find_next_siblings('img')[0]['src']
-
     # 名前とスコアの展開
     row_count = 0
     wiz_value_table = wiz_value.find_next_siblings('table')[0]
@@ -58,29 +58,8 @@ def perse_spirit_state(html):
             row_count = row_count + 1
 
     # ステータスの展開
-    row_count = 0
     wiz_status_table = wiz_value.find_next_siblings('h3')[0].find_next_siblings('table')[0]
-    for row in wiz_status_table.find_all('tr'):
-        for col in row.find_all('td'):
-            if row_count == 0:
-                spirit_type = col.string
-            elif row_count == 1:
-                m = status_re.findall(str(col))
-                if m is not None:
-                    spirit_cost_base = m[0]
-                    spirit_cost = m[1] if len(m) > 1 else spirit_cost_base
-            elif row_count == 2:
-                m = status_re.findall(str(col))
-                if m is not None:
-                    spirit_hp_base = m[0]
-                    spirit_hp = m[1] if len(m) > 1 else spirit_hp_base
-            elif row_count == 3:
-                m = status_re.findall(str(col))
-                if m is not None:
-                    spirit_attack_base = m[0]
-                    spirit_attack = m[1] if len(m) > 1 else spirit_attack_base
-            row_count = row_count + 1
-
+    
     # ASの展開
     row_count = 0
     wiz_as_table = wiz_status_table.find_next_siblings('h3')[0].find_next_siblings('table')[0]
@@ -153,7 +132,31 @@ def perse_spirit_state(html):
                     else:
                         spirit_attribution.append(tmp.get_text())
             row_count = row_count + 1
-    
+
+    row_count = 0
+    wiz_all_status_table = wiz_status_table.find_next_siblings('table')[0]
+    for row in wiz_all_status_table.find_all('tr'):
+        for col in row.find_all('td'):
+            #if row_count == 0:
+            #    spirit_type = col.string
+            #elif row_count == 1:
+            if row_count == 1:
+                m = status_re.findall(str(col))
+                if m is not None:
+                    spirit_cost_base = m[0]
+                    spirit_cost = m[1] if len(m) > 1 else spirit_cost_base
+            elif row_count == 2:
+                m = status_re.findall(str(col))
+                if m is not None:
+                    spirit_hp_base = m[0]
+                    spirit_hp = m[1] if len(m) > 1 else spirit_hp_base
+            elif row_count == 3:
+                m = status_re.findall(str(col))
+                if m is not None:
+                    spirit_attack_base = m[0]
+                    spirit_attack = m[1] if len(m) > 1 else spirit_attack_base
+            row_count = row_count + 1
+
     # AS名の取得
     as_name = wiz_status_table.find_next_siblings('h4')[0]
     as_name = as_name.get_text()
@@ -212,5 +215,5 @@ def perse_spirit_state(html):
     # パース漏れがないかチェック
     for key, value in spirit_dict.iteritems():
         if value is None:
-            logging.error ('Invalid Value: ' + key)
+            log.error ('Invalid Value: ' + key)
     return spirit_dict
