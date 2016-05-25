@@ -62,7 +62,7 @@ def perse_spirit_state(html):
     
     # ASの展開
     row_count = 0
-    wiz_as_table = wiz_status_table.find_next_siblings('h3')[0].find_next_siblings('table')[0]
+    wiz_as_table = wiz_status_table.find_next_siblings('h2', id='wiz_skill')[0].find_next_siblings('table')[0]
     for row in wiz_as_table.find_all('tr'):
         for col in row.find_all('td'):
             if row_count == 0:
@@ -119,7 +119,7 @@ def perse_spirit_state(html):
     
     # 属性の展開
     row_count = 0
-    wiz_status = wiz_legend_table.find_next_siblings('h2', id='wiz_status')[0]
+    wiz_status = soup.find('h2', id='wiz_status')
     wiz_status_table = wiz_status.find_next_siblings('table')[0]
     for row in wiz_status_table.find_all('tr'):
         for col in row.find_all('td'):
@@ -131,6 +131,10 @@ def perse_spirit_state(html):
                         spirit_attribution.append(tmp.get_text().split(':')[1])
                     else:
                         spirit_attribution.append(tmp.get_text())
+            elif row_count == 1:
+                spirit_type = col.get_text()
+            elif row_count == 2:
+                break
             row_count = row_count + 1
 
     row_count = 0

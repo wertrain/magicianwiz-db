@@ -13,10 +13,11 @@ def read_html(filepath):
 
 html = read_html('data/29878.html')
 spirit = gamewith.perse_spirit_state(html)
-print ('OK')
+#print ('OK')
 #print spirit
+print str(spirit).decode('string-escape')
 #print spirit['type']
 
-html = read_html('data/11554.html')
-spirit = gamewith.perse_spirit_state(html)
-print spirit['type']
+#html = read_html('data/11554.html')
+#spirit = gamewith.perse_spirit_state(html)
+#print spirit['type']
