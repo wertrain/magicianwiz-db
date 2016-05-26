@@ -18,4 +18,5 @@ class Race:
     MATERIAL = 7
     ASMODIAN = 8
     MAGICORGANISM = 9
-    ABCD = 10
+    ITEM = 10
+    ABCD = 11
